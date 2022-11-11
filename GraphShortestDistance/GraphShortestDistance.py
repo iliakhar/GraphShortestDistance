@@ -47,6 +47,41 @@ def FordBell(graph):
         answ = pseudoAnsw[:]
     return answ
 
+def MinVal(arr,canUse):
+    global N1
+    ind = -1
+    val = math.inf
+    for j in range(0, len(arr)):
+        if canUse[j] and val > arr[j]:
+            N1 += 2
+            val = arr[j]
+            ind = j
+    return val, ind
+
+def Dijkstra(graph):
+    global N1
+    N1 = 0
+    answ = [[math.inf]*len(graph), [0]*len(graph)]
+    answ[0][0] = answ [0][1] = 0
+    canUseVert = [True]*(len(graph)-1)
+    tmpArr = [graph[0][1:]]
+    tmpArr.append([0]*(len(graph)-1))
+    for i in range(len(graph) - 1):
+        dw,w= MinVal(tmpArr[0], canUseVert)
+        lvert = tmpArr[1][w]
+        canUseVert[w] = False
+        N1 += 1
+        answ[0][w + 1] = dw
+        answ[1][w + 1] = lvert
+        for j in range(len(tmpArr[0])):
+            if canUseVert[j] and tmpArr[0][j] > dw + graph[w + 1][j + 1]:
+                N1+=2
+                tmpArr[0][j] = dw + graph[w + 1][j + 1]
+                tmpArr[1][j] = w + 1
+    return answ
+
+
+
 def ShowMinPathsToVertexs(arr):
     print("\nPaths:")
     for i in range(len(arr)):
@@ -57,26 +92,24 @@ def ShowMinPathsToVertexs(arr):
             path.insert(0, num)
         print(i,' - ', path)
 
-origGraph = [[0, 25, 15, 7, 2],
-             [25, 0, 6, math.inf, math.inf],
-             [15, 6, 0, 4, math.inf],
-             [7, math.inf, 4, 0, 3],
-             [2, math.inf, math.inf, 3, 0]]
-#vertexCount = 5
-#for i in range(vertexCount):
-#    origGraph.append([math.inf]*vertexCount)
-#origGraph[0][0] = origGraph[0][0] = 0
-#origGraph[0][1] = origGraph[1][0] = 25
-#origGraph[0][2] = origGraph[2][0] = 15
-#origGraph[0][3] = origGraph[3][0] = 7
-#origGraph[0][4] = origGraph[4][0] = 2
-#origGraph[0][4] = origGraph[4][0] = 2
-#origGraph[0][4] = origGraph[4][0] = 2
-#origGraph[0][4] = origGraph[4][0] = 2
+origGraph = [[0, 10, 30, 50, 10],
+             [math.inf, 0, math.inf, math.inf, math.inf],
+             [math.inf, math.inf, 0, math.inf, 10],
+             [math.inf, 40, 20, 0, math.inf],
+             [10, math.inf, 10, 30, 0]]
+#origGraph = [[0, 25, 15, 7, 2],
+#             [25, 0, 6, math.inf, math.inf],
+#             [15, 6, 0, 4, math.inf],
+#             [7, math.inf, 4, 0, 3],
+#             [2, math.inf, math.inf, 3, 0]]
 
 answ = FordBell(origGraph[:])
 printGraphTable(origGraph)
 print('\n',answ[0])
 ShowMinPathsToVertexs(answ[1])
+print("\nN1: ",N1)
+answd = Dijkstra(origGraph)
+ShowMinPathsToVertexs(answd[1])
+print('\n',answd[0])
 print("\nN1: ",N1)
 #print(answ[1])
