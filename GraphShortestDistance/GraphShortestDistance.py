@@ -2,6 +2,12 @@ import math
 
 N1 = 0
 
+class Edge:
+    def __init__(self, vertex1, vertex2, lenth):
+        self.v1 = vertex1
+        self.v2 = vertex2
+        self.lenth = lenth
+
 def MyMin(myList):
     global N1
     num = myList[0]
@@ -92,16 +98,25 @@ def ShowMinPathsToVertexs(arr):
             path.insert(0, num)
         print(i,' - ', path)
 
-origGraph = [[0, 10, 30, 50, 10],
-             [math.inf, 0, math.inf, math.inf, math.inf],
-             [math.inf, math.inf, 0, math.inf, 10],
-             [math.inf, 40, 20, 0, math.inf],
-             [10, math.inf, 10, 30, 0]]
-#origGraph = [[0, 25, 15, 7, 2],
-#             [25, 0, 6, math.inf, math.inf],
-#             [15, 6, 0, 4, math.inf],
-#             [7, math.inf, 4, 0, 3],
-#             [2, math.inf, math.inf, 3, 0]]
+def ListGrToMatr(adjList, Nvert):
+    matr = []
+    for i in range(Nvert):
+        matr.append([math.inf]*Nvert)
+        matr[i][i] = 0
+
+    for lst in adjList:
+        matr[lst.v1][lst.v2] = lst.lenth
+    return matr
+
+
+#adjList = [Edge(0,1,10), Edge(0,2,30), Edge(0,3,50), Edge(0,4,10), Edge(2,4,10),
+#           Edge(3,1,40), Edge(3,2,20), Edge(4,0,10), Edge(4,2,10), Edge(4,3,30)];
+
+adjList = [Edge(0,1,25), Edge(0,2,15), Edge(0,3,7), Edge(0,4,2), Edge(1,0,25),
+           Edge(1,2,6), Edge(2,0,15), Edge(2,1,6), Edge(2,3,4), Edge(3,0,7),
+           Edge(3,2,4), Edge(3,4,3), Edge(4,0,2), Edge(4,3,3)];
+
+origGraph = ListGrToMatr(adjList, 5)
 
 answ = FordBell(origGraph[:])
 printGraphTable(origGraph)
