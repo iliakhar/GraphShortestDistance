@@ -13,7 +13,7 @@ def MyMin(myList):
     num = myList[0]
     ind = 0
     for i in range(len(myList)):
-        N1 += 1
+        #N1 += 1
         if myList[i] < num:
             N1 += 1
             num = myList[i]
@@ -36,7 +36,9 @@ def FordBell(graph):
     answ[0][0] = 0
     isStabilized = False
     pseudoAnsw = [[0]*len(graph), [0]*len(graph)]
+    h=0
     while(not(isStabilized)):
+
         isStabilized = True
         for j in range(1, len(graph)):
             sumLen = []
@@ -58,8 +60,9 @@ def MinVal(arr,canUse):
     ind = -1
     val = math.inf
     for j in range(0, len(arr)):
+        N1+=1
         if canUse[j] and val > arr[j]:
-            N1 += 2
+            N1 += 1
             val = arr[j]
             ind = j
     return val, ind
