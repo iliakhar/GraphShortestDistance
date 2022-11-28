@@ -8,6 +8,11 @@ class Edge:
         self.v2 = vertex2
         self.lenth = lenth
 
+class Edge1:
+    def __init__(self, vertex1, vertex2):
+        self.v1 = vertex1
+        self.v2 = vertex2
+
 def MyMin(myList):
     global N1
     num = myList[0]
@@ -20,38 +25,33 @@ def MyMin(myList):
             ind = i
     return num, ind
 
-def printGraphTable(origGraph):
-    for i in range(len(origGraph)):
-        print('\t', i, end = '')
-    for i in range(len(origGraph)):
-        print('\n',i,':\t', end = '')
-        for j in range(len(origGraph)):
-            print(origGraph[i][j], end = '\t')
-    print()
 
-def FordBell(graph):
+def FordBell(graph, vertCount, startVert):
     global N1
     N1 = 0
-    answ = [[math.inf]*len(graph), [0]*len(graph)]
-    answ[0][0] = 0
+    answ = [[math.inf]*vertCount, [0]*vertCount]
+    answ[0][startVert] = 0
     isStabilized = False
-    pseudoAnsw = [[0]*len(graph), [0]*len(graph)]
-    h=0
+    pseudoAnsw = [[0]*vertCount, [0]*vertCount]
+    pseudoAnsw[1][startVert] = None
+    val = 0
     while(not(isStabilized)):
 
         isStabilized = True
-        for j in range(1, len(graph)):
-            sumLen = []
-            for k in range(len(graph)):
-                N1+=1
-                sumLen.append(answ[0][k] + graph[k][j])
-            minSum, ind = MyMin(sumLen)
+        for j in range(0, vertCount):
+            if j!= startVert:
+                sumLen = []
+                for k in range(vertCount):
+                    N1+=1
+                    val =  graph[(k,j)] if (k,j) in graph else math.inf
+                    sumLen.append(answ[0][k] + val)
+                minSum, ind = MyMin(sumLen)
             
-            if minSum != answ[0][j]:
-                N1 += 1
-                pseudoAnsw[0][j] = minSum
-                pseudoAnsw[1][j] = ind
-                isStabilized = False
+                if minSum != answ[0][j]:
+                    N1 += 1
+                    pseudoAnsw[0][j] = minSum
+                    pseudoAnsw[1][j] = ind
+                    isStabilized = False
         answ = pseudoAnsw[:]
     return answ
 
@@ -67,67 +67,77 @@ def MinVal(arr,canUse):
             ind = j
     return val, ind
 
-def Dijkstra(graph):
+def Dijkstra(graph, vertCount, startVert):
     global N1
     N1 = 0
-    answ = [[math.inf]*len(graph), [0]*len(graph)]
-    answ[0][0] = answ [0][1] = 0
-    canUseVert = [True]*(len(graph)-1)
-    tmpArr = [graph[0][1:]]
-    tmpArr.append([0]*(len(graph)-1))
-    for i in range(len(graph) - 1):
+    answ = [[math.inf]*vertCount, [0]*vertCount]
+    answ[0][startVert] = 0
+    answ [1][startVert] = None
+    canUseVert = [True]*vertCount
+    canUseVert[startVert] = False
+    tmpArr = [[0]*vertCount]
+    val = 0
+    for i in range(vertCount):
+        tmpArr[0][i] = graph[(startVert,i)] if (startVert,i) in graph else math.inf
+    tmpArr.append([startVert]*vertCount)
+    for i in range(vertCount - 1):
         dw,w= MinVal(tmpArr[0], canUseVert)
         lvert = tmpArr[1][w]
         canUseVert[w] = False
         N1 += 1
-        answ[0][w + 1] = dw
-        answ[1][w + 1] = lvert
+        answ[0][w] = dw
+        answ[1][w] = lvert
         for j in range(len(tmpArr[0])):
-            if canUseVert[j] and tmpArr[0][j] > dw + graph[w + 1][j + 1]:
+            val = graph[(w,j)] if (w ,j) in graph else math.inf
+            if canUseVert[j] and tmpArr[0][j] > dw + val:
                 N1+=2
-                tmpArr[0][j] = dw + graph[w + 1][j + 1]
-                tmpArr[1][j] = w + 1
+                tmpArr[0][j] = dw + val
+                tmpArr[1][j] = w
     return answ
 
 
 
-def ShowMinPathsToVertexs(arr):
+def ShowMinPathsToVertexs(arr, startVert):
     print("\nPaths:")
     for i in range(len(arr)):
         num = arr[i]
         path = [num]
-        while(num != 0):
+        while(num != startVert and num != None):
             num = arr[num]
             path.insert(0, num)
         print(i,' - ', path)
 
-def ListGrToMatr(adjList, Nvert):
-    matr = []
+
+def ShowTable(mp, Nvert):
     for i in range(Nvert):
-        matr.append([math.inf]*Nvert)
-        matr[i][i] = 0
+        print('\t', i, end = '')
 
-    for lst in adjList:
-        matr[lst.v1][lst.v2] = lst.lenth
-    return matr
+    for i in range(Nvert):
+        print('\n',i,'\t', end = '')
+        for j in range(Nvert):
+            if i == j: print(0,end = '\t')
+            else: print(mp[(i,j)] if (i,j) in mp else math.inf, end = '\t')
+    print()
 
 
-#adjList = [Edge(0,1,10), Edge(0,2,30), Edge(0,3,50), Edge(0,4,10), Edge(2,4,10),
-#           Edge(3,1,40), Edge(3,2,20), Edge(4,0,10), Edge(4,2,10), Edge(4,3,30)];
 
-adjList = [Edge(0,1,25), Edge(0,2,15), Edge(0,3,7), Edge(0,4,2), Edge(1,0,25),
-           Edge(1,2,6), Edge(2,0,15), Edge(2,1,6), Edge(2,3,4), Edge(3,0,7),
-           Edge(3,2,4), Edge(3,4,3), Edge(4,0,2), Edge(4,3,3)];
+mp = {(0,1): 25, (0,2): 15, (0,3):7, (0,4):2, (1,0):25,
+       (1,2):6, (2,0):15, (2,1):6, (2,3):4, (3,0):7,
+       (3,2):4, (3,4):3, (4,0):2, (4,3):3}
 
-origGraph = ListGrToMatr(adjList, 5)
+#mp = {(0,1):10, (0,2):30, (0,3):50, (0,4):10, (2,4):10,
+#      (3,1):40, (3,2):20, (4,0):10, (4,2):10, (4,3):30};
 
-answ = FordBell(origGraph[:])
-printGraphTable(origGraph)
+
+
+ShowTable(mp,5)
+stV = 0
+
+answ = FordBell(mp, 5, stV)
 print('\n',answ[0])
-ShowMinPathsToVertexs(answ[1])
+ShowMinPathsToVertexs(answ[1],stV)
 print("\nN1: ",N1)
-answd = Dijkstra(origGraph)
-ShowMinPathsToVertexs(answd[1])
+answd = Dijkstra(mp, 5, stV)
+ShowMinPathsToVertexs(answd[1],stV)
 print('\n',answd[0])
 print("\nN1: ",N1)
-#print(answ[1])
