@@ -32,9 +32,11 @@ def FordBell(graph, vertCount, startVert):
     answ = [[math.inf]*vertCount, [0]*vertCount]
     answ[0][startVert] = 0
     isStabilized = False
-    pseudoAnsw = [[0]*vertCount, [0]*vertCount]
+    pseudoAnsw = [[math.inf]*vertCount, [0]*vertCount]
+    pseudoAnsw[0][startVert] = 0
     pseudoAnsw[1][startVert] = None
     val = 0
+    count = 0
     while(not(isStabilized)):
 
         isStabilized = True
@@ -53,7 +55,11 @@ def FordBell(graph, vertCount, startVert):
                     pseudoAnsw[1][j] = ind
                     isStabilized = False
         answ = pseudoAnsw[:]
-    return answ
+        if(count == vertCount):
+            print("\nNegative cycle!\n")
+            break
+        count+=1
+    return answ, count == vertCount
 
 def MinVal(arr,canUse):
     global N1
@@ -124,20 +130,29 @@ def ShowTable(mp, Nvert):
 mp = {(0,1): 25, (0,2): 15, (0,3):7, (0,4):2, (1,0):25,
        (1,2):6, (2,0):15, (2,1):6, (2,3):4, (3,0):7,
        (3,2):4, (3,4):3, (4,0):2, (4,3):3}
+vertCount = 5
+
+#mp = {(0,0):0, (0,1):2, (0,2):7, (0,3):4, (0,4):6, (0,5):3,
+#      (1,0):3, (1,1):0, (1,2):4, (1,3):5, (1,4):6, (1,5):1,
+#      (2,0):2, (2,1):4, (2,2):0, (2,3):8, (2,4):7,
+#      (3,0):4, (3,2):8, (3,3):0, (3,4):5, (3,5):7,
+#      (4,1):7, (4,2):8, (4,3):4, (4,4):0, (4,5):3,
+#      (5,0):2, (5,1):4, (5,3):7, (5,4):8, (5,5):0}
 
 #mp = {(0,1):10, (0,2):30, (0,3):50, (0,4):10, (2,4):10,
 #      (3,1):40, (3,2):20, (4,0):10, (4,2):10, (4,3):30};
 
 
 
-ShowTable(mp,5)
-stV = 0
+ShowTable(mp,vertCount)
+stV = 2
 
-answ = FordBell(mp, 5, stV)
+answ, isNeg = FordBell(mp, vertCount, stV)
 print('\n',answ[0])
-ShowMinPathsToVertexs(answ[1],stV)
+if isNeg == False:
+    ShowMinPathsToVertexs(answ[1],stV)
 print("\nN1: ",N1)
-answd = Dijkstra(mp, 5, stV)
+answd = Dijkstra(mp, vertCount, stV)
 ShowMinPathsToVertexs(answd[1],stV)
 print('\n',answd[0])
 print("\nN1: ",N1)
