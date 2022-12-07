@@ -29,6 +29,8 @@ def MyMin(myList):
 def FordBell(graph, vertCount, startVert):
     global N1
     N1 = 0
+    negDict = {}
+    #nd1 = negDict
     answ = [[math.inf]*vertCount, [0]*vertCount]
     answ[0][startVert] = 0
     isStabilized = False
@@ -36,30 +38,32 @@ def FordBell(graph, vertCount, startVert):
     pseudoAnsw[0][startVert] = 0
     pseudoAnsw[1][startVert] = None
     val = 0
-    count = 0
     while(not(isStabilized)):
-
         isStabilized = True
         for j in range(0, vertCount):
             if j!= startVert:
-                sumLen = []
+                #sumLen = []
+                minSum = math.inf
+                minInd = -1
                 for k in range(vertCount):
                     N1+=1
-                    val =  graph[(k,j)] if (k,j) in graph else math.inf
-                    sumLen.append(answ[0][k] + val)
-                minSum, ind = MyMin(sumLen)
-            
-                if minSum != answ[0][j]:
-                    N1 += 1
-                    pseudoAnsw[0][j] = minSum
-                    pseudoAnsw[1][j] = ind
-                    isStabilized = False
+                    #a = (k,j) in negDict
+                    if(k,j) not in negDict:
+                        val =  graph[(k,j)] if (k,j) in graph else math.inf
+                        #if val < 0: negDict[(k,j)] = val
+                        if pseudoAnsw[0][k] + val < minSum:
+                            minSum = pseudoAnsw[0][k] + val
+                            minInd = k
+                if (k,j) not in negDict:
+                    if minSum<0: negDict[(k,j)] = val
+                    if minSum != pseudoAnsw[0][j] and minSum != math.inf:
+                        N1 += 1
+                        pseudoAnsw[0][j] = minSum
+                        pseudoAnsw[1][j] = minInd
+                        isStabilized = False
+        #nd1 = negDict
         answ = pseudoAnsw[:]
-        if(count == vertCount):
-            print("\nNegative cycle!\n")
-            break
-        count+=1
-    return answ, count == vertCount
+    return pseudoAnsw
 
 def MinVal(arr,canUse):
     global N1
@@ -95,8 +99,9 @@ def Dijkstra(graph, vertCount, startVert):
         answ[1][w] = lvert
         for j in range(len(tmpArr[0])):
             val = graph[(w,j)] if (w ,j) in graph else math.inf
+            N1+=1
             if canUseVert[j] and tmpArr[0][j] > dw + val:
-                N1+=2
+                N1+=1
                 tmpArr[0][j] = dw + val
                 tmpArr[1][j] = w
     return answ
@@ -127,17 +132,17 @@ def ShowTable(mp, Nvert):
 
 
 
-mp = {(0,1): 25, (0,2): 15, (0,3):7, (0,4):2, (1,0):25,
-       (1,2):6, (2,0):15, (2,1):6, (2,3):4, (3,0):7,
-       (3,2):4, (3,4):3, (4,0):2, (4,3):3}
-vertCount = 5
+#mp = {(0,1): -25, (0,2): 15, (0,3):-7, (0,4):2, (1,0):-25,
+#       (1,2):-6, (2,0):15, (2,1):-6, (2,3):4, (3,0):-7,
+#       (3,2):4, (3,4):3, (4,0):2, (4,3):3}
+vertCount = 6
 
-#mp = {(0,0):0, (0,1):2, (0,2):7, (0,3):4, (0,4):6, (0,5):3,
-#      (1,0):3, (1,1):0, (1,2):4, (1,3):5, (1,4):6, (1,5):1,
-#      (2,0):2, (2,1):4, (2,2):0, (2,3):8, (2,4):7,
-#      (3,0):4, (3,2):8, (3,3):0, (3,4):5, (3,5):7,
-#      (4,1):7, (4,2):8, (4,3):4, (4,4):0, (4,5):3,
-#      (5,0):2, (5,1):4, (5,3):7, (5,4):8, (5,5):0}
+mp = {(0,0):0, (0,1):-2, (0,2):-7, (0,3):-4, (0,4):-6, (0,5):-3,
+      (1,0):-3, (1,1):0, (1,2):-4, (1,3):-5, (1,4):-6, (1,5):-1,
+      (2,0):-2, (2,1):-4, (2,2):0, (2,3):-8, (2,4):-7,
+      (3,0):-4, (3,2):-8, (3,3):0, (3,4):-5, (3,5):-7,
+      (4,1):-7, (4,2):-8, (4,3):-4, (4,4):0, (4,5):-3,
+      (5,0):-2, (5,1):-4, (5,3):-7, (5,4):-8, (5,5):0}
 
 #mp = {(0,1):10, (0,2):30, (0,3):50, (0,4):10, (2,4):10,
 #      (3,1):40, (3,2):20, (4,0):10, (4,2):10, (4,3):30};
@@ -145,14 +150,13 @@ vertCount = 5
 
 
 ShowTable(mp,vertCount)
-stV = 2
+stV = 0
 
-answ, isNeg = FordBell(mp, vertCount, stV)
+answ= FordBell(mp, vertCount, stV)
 print('\n',answ[0])
-if isNeg == False:
-    ShowMinPathsToVertexs(answ[1],stV)
-print("\nN1: ",N1)
+ShowMinPathsToVertexs(answ[1],stV)
+#print("\nN1: ",N1)
 answd = Dijkstra(mp, vertCount, stV)
 ShowMinPathsToVertexs(answd[1],stV)
 print('\n',answd[0])
-print("\nN1: ",N1)
+#print("\nN1: ",N1)
